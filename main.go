@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"crypto/md5"
 	"encoding/hex"
 	"flag"
@@ -9,7 +10,23 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 )
+
+/*
+https://golang.org/doc/code.html
+
+https://appliedgo.net/tui/
+https://github.com/nsf/termbox-go
+https://github.com/gdamore/tcell
+https://github.com/jroimartin/gocui
+https://github.com/briandowns/spinner
+https://github.com/logrusorgru/aurora
+
+https://ieftimov.com/post/golang-datastructures-trees/
+https://reinkrul.nl/blog/go/golang/merkle/tree/2020/05/21/golang-merkle-tree.html
+*/
+
 
 func hashFileMd5(filePath string) (string, error) {
 	//Initialize variable returnMD5String now in case an error has to be returned
@@ -41,21 +58,143 @@ func hashFileMd5(filePath string) (string, error) {
 	return returnMD5String, nil
 }
 
-func main() {
-	excludePtr := flag.String("exclude", "", "regex that matches all files to be excluded")
-	flag.Parse()
+func checkFile(fileName string, path string) {
+	//TODO Comprobar hash
+	fmt.Println(fileName, "OK !")
+}
 
-	var exclude bool
-	var myr *regexp.Regexp
+func check(fileName string) {
+	file, err := os.Open(fileName)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
 
-	if *excludePtr != "" {
-		exclude = true
-		myr, err := regexp.Compile(*excludePtr)
+	textScanner := bufio.NewScanner(file)
+
+	if textScanner.Scan() == false {
+		panic("[Error] File to check is empty :(")
+	}
+	header := textScanner.Text()
+	fmt.Println("HEADER:", header)
+
+	//TODO get exclude from header https://gobyexample.com/command-line-subcommands
+	exclude := ".git"
+
+	//replace all . -> \.
+	exclude = strings.ReplaceAll(exclude, ".", `\.`)
+
+	//replace all * -> .*
+	exclude = strings.ReplaceAll(exclude, "*", `.*`)
+
+	var excludeRegex *regexp.Regexp
+
+	if exclude != "" {
+		var err error
+		excludeRegex, err = regexp.Compile(exclude)
 		if err != nil {
 			panic(err)
 		}
-	} else {
-		exclude = false
+	}
+
+	scanner := NewFileScanner(textScanner)
+	scanner.Scan()
+
+	root := "."
+	err = filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+
+		//Avoid excluded files
+		if excludeRegex != nil {
+			if excludeRegex.MatchString(path) {
+				return nil
+			}
+		}
+
+		//Avoid directories
+		if info.IsDir() {
+			fmt.Println(path, "is a dir")
+			return nil
+		}
+
+		//LEO UN ARCHIVO DEL FICHERO
+		//caso 1. es el mismo archivo => compruebo el hash
+		//caso 2. el nombre fichero < nombre disco  =>
+		//			archivo que falta en disco =>
+		//			itero del fichero hasta encontrar el mismo (y compruebo su hash) o posterior
+		//caso 3. el nombre fichero > nombre disco  =>
+		//			archivo que sobra en disco =>
+	    //          itero del disco (next) pero he de mantener el ultimo leido del fichero
+
+	    //TODO Como se si ya esta en EOF? => HasMore
+		//if scanner.Text() != scanner.EOF {
+			fileName := scanner.FileName()
+
+			/*
+			fmt.Println("==============================")
+			fmt.Println("FICHERO:", fileName)
+			fmt.Println("DISCO  :", path)
+			fmt.Println("------------------------------")
+			*/
+
+			if fileName == path {
+				// CASE 1. The same file in both file and disk
+				checkFile(fileName, path)
+				scanner.Scan() // Advances to next file
+				return nil
+			} else if fileName < path {
+				// CASE 2. Missing file in disk
+				for fileName <= path {
+					if fileName < path {
+						fmt.Println("[MISSING FILE]", fileName)
+					} else {
+						checkFile(fileName, path)
+					}
+					scanner.Scan() //TODO check eof
+					fileName = scanner.FileName()
+				}
+			} else {
+				// CASE 3. Extra file in disk
+				fmt.Println("[EXTRA   FILE]", path)
+			}
+		//}
+
+		return nil
+	})
+	if err != nil {
+		panic(err)
+	}
+	if scanner.HasMore() {
+		fmt.Println("[MISSING FILE]", scanner.FileName())
+		for scanner.Scan() {
+			fmt.Println("[MISSING FILE]", scanner.FileName())
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		panic(err)
+	}
+}
+
+func generate(exclude string) {
+	// print header for later checking
+	if exclude != "" {
+		fmt.Println("-exclude", exclude)
+	}
+
+	//replace all . -> \.
+	exclude = strings.ReplaceAll(exclude, ".", `\.`)
+
+	//replace all * -> .*
+	exclude = strings.ReplaceAll(exclude, "*", `.*`)
+
+	var excludeRegex *regexp.Regexp
+
+	if exclude != "" {
+		var err error
+		excludeRegex, err = regexp.Compile(exclude)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	var files []string
@@ -64,8 +203,8 @@ func main() {
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 
 		//Avoid excluded files
-		if exclude {
-			if myr.MatchString(path) {
+		if excludeRegex != nil {
+			if excludeRegex.MatchString(path) {
 				return nil
 			}
 		}
@@ -90,5 +229,19 @@ func main() {
 		}
 
 		fmt.Println(file, hash)
+	}
+}
+
+func main() {
+	excludePtr := flag.String("exclude", "", "regex that matches all files to be excluded")
+	outputPtr := flag.String("output", "", "file where to store the results")
+	flag.StringVar(outputPtr, "o", "", "file where to store the results")
+	checkPtr := flag.String("check", "", "file to check")
+	flag.Parse()
+
+	if *checkPtr != "" {
+		check(*checkPtr)
+	} else {
+		generate(*excludePtr)
 	}
 }
