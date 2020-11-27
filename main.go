@@ -2,11 +2,8 @@ package main
 
 import (
 	"bufio"
-	"crypto/md5"
-	"encoding/hex"
 	"flag"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -27,40 +24,17 @@ https://ieftimov.com/post/golang-datastructures-trees/
 https://reinkrul.nl/blog/go/golang/merkle/tree/2020/05/21/golang-merkle-tree.html
 */
 
-
-func hashFileMd5(filePath string) (string, error) {
-	//Initialize variable returnMD5String now in case an error has to be returned
-	var returnMD5String string
-
-	//Open the passed argument and check for any error
-	file, err := os.Open(filePath)
+func checkFile(fileName string, hash1 string , path string) {
+	hash2, err := hashFileMd5(path)
 	if err != nil {
-		return returnMD5String, err
+		panic(err)
 	}
 
-	//Tell the program to call the following function when the current function returns
-	defer file.Close()
-
-	//Open a new hash interface to write to
-	hash := md5.New()
-
-	//Copy the file in the hash interface and check for any error
-	if _, err := io.Copy(hash, file); err != nil {
-		return returnMD5String, err
+	if(hash1 != hash2) {
+		fmt.Println("[DIFFERENCES ]", fileName)
+	} else {
+		fmt.Println(fileName, "OK !")
 	}
-
-	//Get the 16 bytes hash
-	hashInBytes := hash.Sum(nil)[:16]
-
-	//Convert the bytes to a string
-	returnMD5String = hex.EncodeToString(hashInBytes)
-
-	return returnMD5String, nil
-}
-
-func checkFile(fileName string, path string) {
-	//TODO Comprobar hash
-	fmt.Println(fileName, "OK !")
 }
 
 func check(fileName string) {
@@ -76,7 +50,10 @@ func check(fileName string) {
 		panic("[Error] File to check is empty :(")
 	}
 	header := textScanner.Text()
-	fmt.Println("HEADER:", header)
+
+	if(strings.HasPrefix(header,"Options")) {
+		fmt.Println("HEADER:", header)
+	}
 
 	//TODO get exclude from header https://gobyexample.com/command-line-subcommands
 	exclude := ".git"
@@ -128,6 +105,7 @@ func check(fileName string) {
 	    //TODO Como se si ya esta en EOF? => HasMore
 		//if scanner.Text() != scanner.EOF {
 			fileName := scanner.FileName()
+			hash := scanner.Hash()
 
 			/*
 			fmt.Println("==============================")
@@ -138,7 +116,7 @@ func check(fileName string) {
 
 			if fileName == path {
 				// CASE 1. The same file in both file and disk
-				checkFile(fileName, path)
+				checkFile(fileName, hash, path)
 				scanner.Scan() // Advances to next file
 				return nil
 			} else if fileName < path {
@@ -147,7 +125,7 @@ func check(fileName string) {
 					if fileName < path {
 						fmt.Println("[MISSING FILE]", fileName)
 					} else {
-						checkFile(fileName, path)
+						checkFile(fileName, hash, path)
 					}
 					scanner.Scan() //TODO check eof
 					fileName = scanner.FileName()
@@ -178,7 +156,7 @@ func check(fileName string) {
 func generate(exclude string) {
 	// print header for later checking
 	if exclude != "" {
-		fmt.Println("-exclude", exclude)
+		fmt.Println("Options: -exclude", exclude)
 	}
 
 	//replace all . -> \.
@@ -211,7 +189,6 @@ func generate(exclude string) {
 
 		//Avoid directories
 		if info.IsDir() {
-			fmt.Println(path, "is a dir")
 			return nil
 		}
 

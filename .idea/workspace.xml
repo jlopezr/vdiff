@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="2167a955-3067-42f5-8074-ec59398dc887" name="Default Changelist" comment="" />
+    <list default="true" id="2167a955-3067-42f5-8074-ec59398dc887" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/hash_comparison.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -11,10 +16,14 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Go Application" />
+        <option value="Go File" />
       </list>
     </option>
   </component>
   <component name="GOROOT" path="/opt/local/lib/go" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="GoLibraries">
     <option name="indexEntireGoPath" value="false" />
   </component>
@@ -24,7 +33,7 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
-    <property name="DefaultGoTemplateProperty" value="Go Application" />
+    <property name="DefaultGoTemplateProperty" value="Go File" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="go.import.settings.migrated" value="true" />
@@ -72,38 +81,38 @@
       <screen x="0" y="23" width="1440" height="877" />
     </state>
     <state x="622" y="330" key="EnvironmentVariablesDialog/0.23.1440.877@0.23.1440.877" timestamp="1604920608986" />
-    <state width="1398" height="231" key="GridCell.Tab.0.bottom" timestamp="1604932866643">
+    <state width="1358" height="217" key="GridCell.Tab.0.bottom" timestamp="1604995768036">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
-    <state width="1398" height="231" key="GridCell.Tab.0.bottom/0.23.1440.877@0.23.1440.877" timestamp="1604932866643" />
-    <state width="1398" height="231" key="GridCell.Tab.0.center" timestamp="1604932866642">
+    <state width="1358" height="217" key="GridCell.Tab.0.bottom/0.23.1440.877@0.23.1440.877" timestamp="1604995768036" />
+    <state width="1358" height="217" key="GridCell.Tab.0.center" timestamp="1604995768034">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
-    <state width="1398" height="231" key="GridCell.Tab.0.center/0.23.1440.877@0.23.1440.877" timestamp="1604932866642" />
-    <state width="1398" height="231" key="GridCell.Tab.0.left" timestamp="1604932866641">
+    <state width="1358" height="217" key="GridCell.Tab.0.center/0.23.1440.877@0.23.1440.877" timestamp="1604995768034" />
+    <state width="1358" height="217" key="GridCell.Tab.0.left" timestamp="1604995768034">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
-    <state width="1398" height="231" key="GridCell.Tab.0.left/0.23.1440.877@0.23.1440.877" timestamp="1604932866641" />
-    <state width="1398" height="231" key="GridCell.Tab.0.right" timestamp="1604932866642">
+    <state width="1358" height="217" key="GridCell.Tab.0.left/0.23.1440.877@0.23.1440.877" timestamp="1604995768034" />
+    <state width="1358" height="217" key="GridCell.Tab.0.right" timestamp="1604995768035">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
-    <state width="1398" height="231" key="GridCell.Tab.0.right/0.23.1440.877@0.23.1440.877" timestamp="1604932866642" />
-    <state width="1398" height="286" key="GridCell.Tab.1.bottom" timestamp="1604928647762">
+    <state width="1358" height="217" key="GridCell.Tab.0.right/0.23.1440.877@0.23.1440.877" timestamp="1604995768035" />
+    <state width="1398" height="286" key="GridCell.Tab.1.bottom" timestamp="1604935043733">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
-    <state width="1398" height="286" key="GridCell.Tab.1.bottom/0.23.1440.877@0.23.1440.877" timestamp="1604928647762" />
-    <state width="1398" height="286" key="GridCell.Tab.1.center" timestamp="1604928647761">
+    <state width="1398" height="286" key="GridCell.Tab.1.bottom/0.23.1440.877@0.23.1440.877" timestamp="1604935043733" />
+    <state width="1398" height="286" key="GridCell.Tab.1.center" timestamp="1604935043733">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
-    <state width="1398" height="286" key="GridCell.Tab.1.center/0.23.1440.877@0.23.1440.877" timestamp="1604928647761" />
-    <state width="1398" height="286" key="GridCell.Tab.1.left" timestamp="1604928647761">
+    <state width="1398" height="286" key="GridCell.Tab.1.center/0.23.1440.877@0.23.1440.877" timestamp="1604935043733" />
+    <state width="1398" height="286" key="GridCell.Tab.1.left" timestamp="1604935043732">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
-    <state width="1398" height="286" key="GridCell.Tab.1.left/0.23.1440.877@0.23.1440.877" timestamp="1604928647761" />
-    <state width="1398" height="286" key="GridCell.Tab.1.right" timestamp="1604928647761">
+    <state width="1398" height="286" key="GridCell.Tab.1.left/0.23.1440.877@0.23.1440.877" timestamp="1604935043732" />
+    <state width="1398" height="286" key="GridCell.Tab.1.right" timestamp="1604935043733">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
-    <state width="1398" height="286" key="GridCell.Tab.1.right/0.23.1440.877@0.23.1440.877" timestamp="1604928647761" />
+    <state width="1398" height="286" key="GridCell.Tab.1.right/0.23.1440.877@0.23.1440.877" timestamp="1604935043733" />
     <state x="229" y="100" key="SettingsEditor" timestamp="1604850238041">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
@@ -118,7 +127,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/main.go</url>
-          <line>138</line>
+          <line>116</line>
           <option name="timeStamp" value="8" />
         </line-breakpoint>
       </breakpoints>
