@@ -22,15 +22,29 @@ https://github.com/logrusorgru/aurora
 
 https://ieftimov.com/post/golang-datastructures-trees/
 https://reinkrul.nl/blog/go/golang/merkle/tree/2020/05/21/golang-merkle-tree.html
+
+COLORES:
+unknown		gris
+same		negro
+orphan		lila
+older		gris
+newer		rojo
+different	rojo
+
+||[ ] filename    | size | modified |   ||[ ] filename    | size | modified ||
+
+Inspiracion:
+https://naarakstudio.com/direqual/index.html
+
 */
 
-func checkFile(fileName string, hash1 string , path string) {
+func checkFile(fileName string, hash1 string, path string) {
 	hash2, err := hashFileMd5(path)
 	if err != nil {
 		panic(err)
 	}
 
-	if(hash1 != hash2) {
+	if hash1 != hash2 {
 		fmt.Println("[DIFFERENCES ]", fileName)
 	} else {
 		fmt.Println(fileName, "OK !")
@@ -51,7 +65,7 @@ func check(fileName string) {
 	}
 	header := textScanner.Text()
 
-	if(strings.HasPrefix(header,"Options")) {
+	if strings.HasPrefix(header, "Options") {
 		fmt.Println("HEADER:", header)
 	}
 
@@ -100,40 +114,40 @@ func check(fileName string) {
 		//			itero del fichero hasta encontrar el mismo (y compruebo su hash) o posterior
 		//caso 3. el nombre fichero > nombre disco  =>
 		//			archivo que sobra en disco =>
-	    //          itero del disco (next) pero he de mantener el ultimo leido del fichero
+		//          itero del disco (next) pero he de mantener el ultimo leido del fichero
 
-	    //TODO Como se si ya esta en EOF? => HasMore
+		//TODO Como se si ya esta en EOF? => HasMore
 		//if scanner.Text() != scanner.EOF {
-			fileName := scanner.FileName()
-			hash := scanner.Hash()
+		fileName := scanner.FileName()
+		hash := scanner.Hash()
 
-			/*
+		/*
 			fmt.Println("==============================")
 			fmt.Println("FICHERO:", fileName)
 			fmt.Println("DISCO  :", path)
 			fmt.Println("------------------------------")
-			*/
+		*/
 
-			if fileName == path {
-				// CASE 1. The same file in both file and disk
-				checkFile(fileName, hash, path)
-				scanner.Scan() // Advances to next file
-				return nil
-			} else if fileName < path {
-				// CASE 2. Missing file in disk
-				for fileName <= path {
-					if fileName < path {
-						fmt.Println("[MISSING FILE]", fileName)
-					} else {
-						checkFile(fileName, hash, path)
-					}
-					scanner.Scan() //TODO check eof
-					fileName = scanner.FileName()
+		if fileName == path {
+			// CASE 1. The same file in both file and disk
+			checkFile(fileName, hash, path)
+			scanner.Scan() // Advances to next file
+			return nil
+		} else if fileName < path {
+			// CASE 2. Missing file in disk
+			for fileName <= path {
+				if fileName < path {
+					fmt.Println("[MISSING FILE]", fileName)
+				} else {
+					checkFile(fileName, hash, path)
 				}
-			} else {
-				// CASE 3. Extra file in disk
-				fmt.Println("[EXTRA   FILE]", path)
+				scanner.Scan() //TODO check eof
+				fileName = scanner.FileName()
 			}
+		} else {
+			// CASE 3. Extra file in disk
+			fmt.Println("[EXTRA   FILE]", path)
+		}
 		//}
 
 		return nil
@@ -209,7 +223,8 @@ func generate(exclude string) {
 	}
 }
 
-func main() {
+func OLDmain() {
+
 	excludePtr := flag.String("exclude", "", "regex that matches all files to be excluded")
 	outputPtr := flag.String("output", "", "file where to store the results")
 	flag.StringVar(outputPtr, "o", "", "file where to store the results")
@@ -221,4 +236,6 @@ func main() {
 	} else {
 		generate(*excludePtr)
 	}
+
+	//Prueba()
 }

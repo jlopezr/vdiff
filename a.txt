@@ -1,0 +1,17 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+
+    printf("*%s*\r\n", "PELOTA");
+    printf("*%.4s*\r\n", "PELOTA");
+    printf("*%.4s*\r\n", "PE");
+    printf("*%4s*\r\n", "PE");
+    printf("*%4.4s*\r\n", "PE");
+    printf("*%-4.4s*\r\n", "PE");
+    printf("*%4s*\r\n", "PELOTA");
+    printf("*%4.4s*\r\n", "PELOTA");
+    printf("*%-4.4s*\r\n", "PELOTA");
+    return 0;
+}
+

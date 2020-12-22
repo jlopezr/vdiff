@@ -6,10 +6,10 @@ import (
 )
 
 type FileScanner struct {
-	scanner *bufio.Scanner
+	scanner  *bufio.Scanner
 	fileName string
-	hash string
-	hasMore bool
+	hash     string
+	hasMore  bool
 }
 
 func NewFileScanner(scanner *bufio.Scanner) *FileScanner {
@@ -35,7 +35,7 @@ func (f *FileScanner) Scan() bool {
 		}
 
 		f.hash = line[len(line)-32:]
-		f.fileName = line[0:len(line)-33]
+		f.fileName = line[0 : len(line)-33]
 		f.hasMore = true
 		return true
 	}
