@@ -175,6 +175,11 @@ func check(fileName string) {
 	}
 }
 
+type FileAndInfo struct {
+	file string
+	info os.FileInfo
+}
+
 func generate(exclusions arrayFlags) {
 	// print header for later checking
 	var regex *FileExclusions
@@ -183,7 +188,7 @@ func generate(exclusions arrayFlags) {
 		regex = CreateFileExclusions(exclusions)
 	}
 
-	var files []string
+	var files []FileAndInfo
 
 	root := "."
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
@@ -200,21 +205,34 @@ func generate(exclusions arrayFlags) {
 			return nil
 		}
 
-		files = append(files, path)
+		files = append(files, FileAndInfo{
+			file: path,
+			info: info,
+		})
 		return nil
 	})
 	if err != nil {
 		panic(err)
 	}
-	for _, file := range files {
-		hash, err := hashFileMd5(file)
+	for _, f := range files {
+
+		var hash string
+		var err error
+
+		//Treat symlinks
+		if f.info.Mode()&os.ModeSymlink == os.ModeSymlink {
+			hash, err = os.Readlink(f.file)
+			hash = fmt.Sprintf("-> %s", hash)
+		} else {
+			hash, err = hashFileMd5(f.file)
+		}
 
 		if err != nil {
 			hash = fmt.Sprintf("*ERROR* %s", err.Error())
 			//panic(err)
 		}
 
-		fmt.Println(file, hash)
+		fmt.Println(f.file, hash)
 	}
 }
 
