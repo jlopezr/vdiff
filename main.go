@@ -12,19 +12,22 @@ import (
 
 /*
 FUNCIONES QUE FALTAN:
-- si hay un error de I/O o permisos que muestre la linea y el problema pero continue
-- que puedas poner multiples expressiones para excluir ficheros
+X si hay un error de I/O o permisos que muestre la linea y el problema pero continue
+X que puedas poner multiples expressiones para excluir ficheros
 - que puedas decir que no siga los links simbolicos
 
+Modules structure
 https://golang.org/doc/code.html
-
+Do not defer on close
+https://www.joeshaw.org/dont-defer-close-on-writable-files/
+Other TUI libs
 https://appliedgo.net/tui/
 https://github.com/nsf/termbox-go
 https://github.com/gdamore/tcell
 https://github.com/jroimartin/gocui
 https://github.com/briandowns/spinner
 https://github.com/logrusorgru/aurora
-
+Data structures
 https://ieftimov.com/post/golang-datastructures-trees/
 https://reinkrul.nl/blog/go/golang/merkle/tree/2020/05/21/golang-merkle-tree.html
 
@@ -172,26 +175,12 @@ func check(fileName string) {
 	}
 }
 
-func generate(exclude string) {
+func generate(exclusions arrayFlags) {
 	// print header for later checking
-	if exclude != "" {
-		fmt.Println("Options: -exclude", exclude)
-	}
-
-	//replace all . -> \.
-	exclude = strings.ReplaceAll(exclude, ".", `\.`)
-
-	//replace all * -> .*
-	exclude = strings.ReplaceAll(exclude, "*", `.*`)
-
-	var excludeRegex *regexp.Regexp
-
-	if exclude != "" {
-		var err error
-		excludeRegex, err = regexp.Compile(exclude)
-		if err != nil {
-			panic(err)
-		}
+	var regex *FileExclusions
+	if exclusions != nil {
+		fmt.Println("Options: -exclude", exclusions.String())
+		regex = CreateFileExclusions(exclusions)
 	}
 
 	var files []string
@@ -200,8 +189,8 @@ func generate(exclude string) {
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 
 		//Avoid excluded files
-		if excludeRegex != nil {
-			if excludeRegex.MatchString(path) {
+		if regex != nil {
+			if regex.MatchString(path) {
 				return nil
 			}
 		}
@@ -221,25 +210,72 @@ func generate(exclude string) {
 		hash, err := hashFileMd5(file)
 
 		if err != nil {
-			panic(err)
+			hash = fmt.Sprintf("*ERROR* %s", err.Error())
+			//panic(err)
 		}
 
 		fmt.Println(file, hash)
 	}
 }
 
-func Xmain() {
+type FileExclusions struct {
+	regex []regexp.Regexp
+}
 
-	excludePtr := flag.String("exclude", "", "regex that matches all files to be excluded")
+func (f *FileExclusions) MatchString(txt string) bool {
+	for _, r := range (*f).regex {
+		if r.MatchString(txt) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func CreateFileExclusions(a arrayFlags) *FileExclusions {
+	result := &FileExclusions {}
+
+	for _, f := range a {
+		//replace all . -> \.
+		tmp := strings.ReplaceAll(f, ".", `\.`)
+		//replace all * -> .*
+		tmp = strings.ReplaceAll(tmp, "*", `.*`)
+
+		regex, err := regexp.Compile(tmp)
+		if err != nil {
+				panic(err)
+			}
+
+		result.regex = append(result.regex, *regex)
+	}
+
+	return result
+}
+
+type arrayFlags []string
+
+func (a *arrayFlags) String() string {
+	return strings.Join(*a,",")
+}
+
+func (a *arrayFlags) Set(value string) error {
+	*a = append(*a, value)
+	return nil
+}
+
+func main() {
+	//excludePtr := flag.String("exclude", "", "regex that matches all files to be excluded")
 	outputPtr := flag.String("output", "", "file where to store the results")
 	flag.StringVar(outputPtr, "o", "", "file where to store the results")
 	checkPtr := flag.String("check", "", "file to check")
+	var exclusions arrayFlags
+	flag.Var(&exclusions, "e", "regex that matches all files to be excluded. Can be set multiple times.")
 	flag.Parse()
 
 	if *checkPtr != "" {
 		check(*checkPtr)
 	} else {
-		generate(*excludePtr)
+		generate(exclusions)
 	}
 
 	//Prueba()
