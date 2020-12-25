@@ -4,6 +4,7 @@ import (
 	"fmt"
 	ui "github.com/VladimirMarkelov/clui"
 	term "github.com/nsf/termbox-go"
+	"time"
 
 	//term "github.com/nsf/termbox-go"
 )
@@ -15,7 +16,7 @@ func createDirInfo() DirInfo {
 		children:  make([]*EntryInfo, 0),
 	}
 
-	for i:=0;i<50;i++ {
+	for i := 0; i < 50; i++ {
 		dir.AppendEntry(fmt.Sprintf("Item %d", i))
 	}
 
@@ -60,6 +61,25 @@ func createPanel(view ui.Control, dirinfo DirInfo) *ui.TableView {
 	})
 
 	return panel
+}
+
+func ModifyUI(label *ui.Label) {
+
+	ticker := time.NewTicker(1000 * time.Millisecond)
+	done := make(chan bool)
+	go func() {
+		i:=1
+		for {
+			select {
+			case <-done:
+				return
+			case _ = <-ticker.C:
+				label.SetTitle(fmt.Sprintf("%d sec", i))
+				i++
+				ui.RefreshScreen()
+			}
+		}
+	}()
 }
 
 func main() {
@@ -120,6 +140,8 @@ func main() {
 			go ui.Stop()
 		})
 	*/
+
+	go ModifyUI(label1)
 
 	ui.MainLoop()
 }
