@@ -107,6 +107,6 @@ func mainLoop() {
 	ui.MainLoop()
 }
 
-func main() {
+func XXmain() {
 	mainLoop()
 }

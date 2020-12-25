@@ -11,6 +11,11 @@ import (
 )
 
 /*
+FUNCIONES QUE FALTAN:
+- si hay un error de I/O o permisos que muestre la linea y el problema pero continue
+- que puedas poner multiples expressiones para excluir ficheros
+- que puedas decir que no siga los links simbolicos
+
 https://golang.org/doc/code.html
 
 https://appliedgo.net/tui/
@@ -223,7 +228,7 @@ func generate(exclude string) {
 	}
 }
 
-func OLDmain() {
+func Xmain() {
 
 	excludePtr := flag.String("exclude", "", "regex that matches all files to be excluded")
 	outputPtr := flag.String("output", "", "file where to store the results")

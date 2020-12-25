@@ -54,6 +54,14 @@ func (d *DirInfo) AppendEntry(name string) {
 	d.children = append(d.children, &e)
 }
 
+func (d *DirInfo) EntryCount() int {
+	return len(d.children)
+}
+
+func (d *DirInfo) GetEntry(i int) *EntryInfo {
+	return d.children[i]
+}
+
 type FileInfo struct {
 }
 
