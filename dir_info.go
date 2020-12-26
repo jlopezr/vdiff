@@ -1,87 +1,200 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+	"strings"
+	"time"
+)
 
-type GenericInfo interface {
-	Hash() string
-	EntryType() string
-	Print()
+type EntryType uint8
+
+const (
+	FILE EntryType = iota
+	DIRECTORY
+	SYMLINK
+	NOT_EXIST
+	UNKNOWN
+)
+
+var entries = [...]string{
+	"FILE",
+	"DIRECTORY",
+	"SYMLINK",
+	"NOT_EXIST",
+	"UNKNOWN",
 }
 
-const (
-	FILE      int = 0
-	DIRECTORY int = 1
-)
+func (t EntryType) String() string {
+	return entries[t]
+}
+
+type EntryState uint8
 
 const (
-	NOT_CHECKED_YET int = -1
-	EQUALS          int = 0
-	DIFFERENT       int = 1
-	MISSING_RIGHT   int = 2
-	EXTRA_RIGHT     int = 3
+	NOT_CHECKED_YET EntryState = iota
+	EQUALS
+	DIFFERENT
+	NEWEST_LEFT
+	NEWEST_RIGHT
+	MISSING_LEFT
+	MISSING_RIGHT
 )
+
+var states = [...]string{
+	"NOT_CHECKED_YET",
+	"EQUALS",
+	"DIFFERENT",
+	"NEWEST_LEFT",
+	"NEWEST_RIGHT",
+	"MISSING_LEFT",
+	"MISSING_RIGHT",
+}
+
+func (t EntryState) String() string {
+	return states[t]
+}
 
 type EntryInfo struct {
-	name  string
-	left  *EntryInfo
-	right *EntryInfo
-	state int
+	Hash             string
+	Size             int64
+	LastModification time.Time
+	Type             EntryType
+}
+
+type GenericInfo struct {
+	Name  string
+	Left  EntryInfo
+	Right EntryInfo
+	State EntryState
+}
+
+type DirEntry struct {
+	GenericInfo
+	Info *DirInfo
+}
+
+//Quiza podemos usar una estructura diferente si sabemos que ninguno de los dos lados es un directorio y ahorrar 1 puntero
+type FileEntry struct {
+	GenericInfo
 }
 
 type DirInfo struct {
-	leftPath  string
-	rightPath string
-	children  []*EntryInfo
-}
+	GenericInfo
+	LeftPath  string
+	RightPath string
 
-func (d DirInfo) EntryType() int {
-	return DIRECTORY
-}
-
-func (d DirInfo) Print() {
-	fmt.Println(d.leftPath + "\t\t\t" + d.rightPath)
-	for i, s := range d.children {
-		fmt.Println(i, s.name, s.state)
-	}
-}
-
-func (d *DirInfo) AppendEntry(name string) {
-	e := EntryInfo{
-		name:  name,
-		state: NOT_CHECKED_YET,
-	}
-
-	d.children = append(d.children, &e)
-}
-
-func (d *DirInfo) EntryCount() int {
-	return len(d.children)
-}
-
-func (d *DirInfo) GetEntry(i int) *EntryInfo {
-	return d.children[i]
-}
-
-type FileInfo struct {
-}
-
-func (d FileInfo) EntryType() int {
-	return FILE
-}
-
-func (d FileInfo) Print() {
-	fmt.Println("*TODO*")
+	Files []*DirEntry
 }
 
 func Prueba() {
 	d1 := DirInfo{
-		leftPath:  "/Users/juan/a",
-		rightPath: "/Users/juan/b",
-		children:  make([]*EntryInfo, 0),
+		LeftPath:  "/Users/juan/a",
+		RightPath: "/Users/juan/b",
+		Files:     make([]*DirEntry, 0),
 	}
 
-	d1.AppendEntry("juan")
-	d1.AppendEntry("toni")
+	e3 := d1.AppendDirectory("dir1")
+	d1.AppendEntry("file1")
+	d1.AppendEntry("file2")
+
+	e1 := d1.GetEntry(1)
+	e1.State = EQUALS
+	e1.Left.Type = FILE
+	e1.Right.Type = FILE
+
+	_, e2 := d1.FindEntry("file2")
+	e2.State = DIFFERENT
+	e1.Left.Type = FILE
+	e1.Right.Type = SYMLINK
+
+	e3.State = DIFFERENT
+	d2 := e3.Info
+	d2.AppendFile("a")
+	d2.AppendFile("b")
 
 	d1.Print()
+}
+
+func (d DirInfo) Print() {
+	d.PrintTab(0)
+}
+
+func (d DirInfo) PrintTab(level int) {
+	tabs := strings.Repeat("\t", level)
+	fmt.Println(tabs + d.LeftPath + "\t\t\t" + d.RightPath)
+	for i, s := range d.Files {
+
+		fmt.Println(tabs, i, s.Name, s.State, s.Left.Hash, s.Left.Type, s.Right.Hash, s.Right.Type)
+
+		if s.Info != nil && (s.Left.Type == DIRECTORY || s.Right.Type == DIRECTORY) {
+			s.Info.PrintTab(level + 1)
+		}
+	}
+}
+
+func (d *DirInfo) EntryCount() int {
+	return len(d.Files)
+}
+
+func (d *DirInfo) GetEntry(i int) *DirEntry {
+	return d.Files[i]
+}
+
+func (d *DirEntry) GetInfo(isLeft bool) EntryInfo {
+	if isLeft {
+		return d.Left
+	} else {
+		return d.Right
+	}
+}
+
+func (d *DirInfo) FindEntry(name string) (int, *DirEntry) {
+	for i, entry := range d.Files {
+		if entry.Name == name {
+			return i, entry
+		}
+	}
+	return -1, nil
+}
+
+func (d *DirInfo) AppendEntry(name string) *DirEntry {
+	e := DirEntry{}
+	e.Name = name
+	e.State = NOT_CHECKED_YET
+	e.Left.Type = UNKNOWN
+	e.Right.Type = UNKNOWN
+	e.Left.Hash = fmt.Sprintf("HASH1-%s", name)
+	e.Right.Hash = fmt.Sprintf("HASH2-%s", name)
+	d.Files = append(d.Files, &e)
+	return &e
+}
+
+func (d *DirInfo) AppendFile(name string) *DirEntry {
+	e := DirEntry{}
+	e.Name = name
+	e.State = NOT_CHECKED_YET
+	e.Left.Type = FILE
+	e.Right.Type = UNKNOWN
+	e.Left.Hash = fmt.Sprintf("HASH1-%s", name)
+	d.Files = append(d.Files, &e)
+	return &e
+}
+
+func (d *DirInfo) AppendDirectory(name string) *DirEntry {
+	e := DirEntry{}
+	e.Name = name
+	e.State = NOT_CHECKED_YET
+	e.Left.Type = DIRECTORY
+	e.Right.Type = UNKNOWN
+	e.Left.Hash = fmt.Sprintf("HASH1-%s", name)
+	d.Files = append(d.Files, &e)
+
+	dirInfo := DirInfo{}
+	dirInfo.Name = name //TODO Se podria ahorrar repetir el name
+	dirInfo.LeftPath = fmt.Sprintf("%s%c%s", d.LeftPath, os.PathSeparator, name)
+	dirInfo.RightPath = fmt.Sprintf("%s%c%s", d.RightPath, os.PathSeparator, name)
+
+	e.Info = &dirInfo
+	return &e
 }

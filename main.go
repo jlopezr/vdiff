@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -14,7 +13,8 @@ import (
 FUNCIONES QUE FALTAN:
 X si hay un error de I/O o permisos que muestre la linea y el problema pero continue
 X que puedas poner multiples expressiones para excluir ficheros
-- que puedas decir que no siga los links simbolicos
+X que puedas decir que no siga los links simbolicos
+- apañar el check para que funcione con links simbolicos y multiples exclusiones
 
 Modules structure
 https://golang.org/doc/code.html
@@ -30,6 +30,10 @@ https://github.com/logrusorgru/aurora
 Data structures
 https://ieftimov.com/post/golang-datastructures-trees/
 https://reinkrul.nl/blog/go/golang/merkle/tree/2020/05/21/golang-merkle-tree.html
+Optimize binary size
+https://blog.filippo.io/shrink-your-go-binaries-with-this-one-weird-trick/
+Enums
+http://golang-basic.blogspot.com/2014/07/step-by-step-guide-to-declaring-enums.html
 
 COLORES:
 unknown		gris
@@ -180,7 +184,7 @@ type FileAndInfo struct {
 	info os.FileInfo
 }
 
-func generate(exclusions arrayFlags) {
+func generate(exclusions ArrayFlags) {
 	// print header for later checking
 	var regex *FileExclusions
 	if exclusions != nil {
@@ -250,7 +254,7 @@ func (f *FileExclusions) MatchString(txt string) bool {
 	return false
 }
 
-func CreateFileExclusions(a arrayFlags) *FileExclusions {
+func CreateFileExclusions(a ArrayFlags) *FileExclusions {
 	result := &FileExclusions {}
 
 	for _, f := range a {
@@ -270,23 +274,23 @@ func CreateFileExclusions(a arrayFlags) *FileExclusions {
 	return result
 }
 
-type arrayFlags []string
+type ArrayFlags []string
 
-func (a *arrayFlags) String() string {
+func (a *ArrayFlags) String() string {
 	return strings.Join(*a,",")
 }
 
-func (a *arrayFlags) Set(value string) error {
+func (a *ArrayFlags) Set(value string) error {
 	*a = append(*a, value)
 	return nil
 }
 
-func main() {
-	//excludePtr := flag.String("exclude", "", "regex that matches all files to be excluded")
+func OLDmain() {
+	/*
 	outputPtr := flag.String("output", "", "file where to store the results")
 	flag.StringVar(outputPtr, "o", "", "file where to store the results")
 	checkPtr := flag.String("check", "", "file to check")
-	var exclusions arrayFlags
+	var exclusions ArrayFlags
 	flag.Var(&exclusions, "e", "regex that matches all files to be excluded. Can be set multiple times.")
 	flag.Parse()
 
@@ -295,6 +299,6 @@ func main() {
 	} else {
 		generate(exclusions)
 	}
-
-	//Prueba()
+*/
+	Prueba()
 }

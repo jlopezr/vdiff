@@ -4,6 +4,7 @@ import (
 	"fmt"
 	ui "github.com/VladimirMarkelov/clui"
 	term "github.com/nsf/termbox-go"
+	"strconv"
 	"time"
 
 	//term "github.com/nsf/termbox-go"
@@ -11,9 +12,9 @@ import (
 
 func createDirInfo() DirInfo {
 	dir := DirInfo{
-		leftPath:  "/Users/juan/a",
-		rightPath: "/Users/juan/b",
-		children:  make([]*EntryInfo, 0),
+		LeftPath:  "/Users/juan/a",
+		RightPath: "/Users/juan/b",
+		Files:     make([]*DirEntry, 0),
 	}
 
 	for i := 0; i < 50; i++ {
@@ -23,7 +24,7 @@ func createDirInfo() DirInfo {
 	return dir
 }
 
-func createPanel(view ui.Control, dirinfo DirInfo) *ui.TableView {
+func createPanel(view ui.Control, dirinfo DirInfo, isLeft bool) *ui.TableView {
 	panel := ui.CreateTableView(view, 25, 12, 1)
 
 	panel.SetShowLines(true)
@@ -44,18 +45,19 @@ func createPanel(view ui.Control, dirinfo DirInfo) *ui.TableView {
 			info.Bg = term.ColorLightGray
 			info.Fg = term.ColorRed
 		}
+		entry := dirinfo.GetEntry(info.Row)
 		switch info.Col {
 		case 0:
-			info.Text = dirinfo.GetEntry(info.Row).name
+			info.Text = entry.Name
 			break
 		case 1:
-			info.Text = "HASH"
+			info.Text = entry.GetInfo(isLeft).Hash
 			break
 		case 2:
-			info.Text = "SIZE"
+			info.Text = strconv.FormatInt(entry.GetInfo(isLeft).Size, 10)
 			break
 		case 3:
-			info.Text = "MODIFIED"
+			info.Text = entry.GetInfo(isLeft).LastModification.String()
 			break
 		}
 	})
@@ -77,12 +79,17 @@ func ModifyUI(label *ui.Label) {
 				label.SetTitle(fmt.Sprintf("%d sec", i))
 				i++
 				ui.RefreshScreen()
+				ev := ui.Event{
+					Type: ui.EventRedraw, // ui.EventChanged
+
+				}
+				ui.PutEvent(ev)
 			}
 		}
 	}()
 }
 
-func Xmain() {
+func main() {
 	ui.InitLibrary()
 	defer ui.DeinitLibrary()
 
@@ -100,8 +107,8 @@ func Xmain() {
 	frameBottom := ui.CreateFrame(window, ui.AutoSize, 1, ui.BorderNone, ui.Fixed)
 	frameBottom.SetPack(ui.Horizontal)
 
-	left := createPanel(frameTop, dirinfo)
-	right := createPanel(frameTop, dirinfo)
+	left := createPanel(frameTop, dirinfo, true)
+	right := createPanel(frameTop, dirinfo, false)
 
 	label1 := ui.CreateLabel(frameBottom, ui.AutoSize, ui.AutoSize, "HELLO", 1)
 	label1.SetAlign(ui.AlignCenter)
