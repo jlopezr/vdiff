@@ -10,19 +10,23 @@ import (
 type EntryType uint8
 
 const (
-	FILE EntryType = iota
+	UNKNOWN EntryType = iota
+	FILE
 	DIRECTORY
 	SYMLINK
 	NOT_EXIST
-	UNKNOWN
+	ERROR
+	ERROR_FILE
+	ERROR_DIRECTORY
+	ERROR_SYMLINK
 )
 
 var entries = [...]string{
+	"UNKNOWN",
 	"FILE",
 	"DIRECTORY",
 	"SYMLINK",
 	"NOT_EXIST",
-	"UNKNOWN",
 }
 
 func (t EntryType) String() string {
@@ -87,35 +91,6 @@ type DirInfo struct {
 	Files []*DirEntry
 }
 
-func Prueba() {
-	d1 := DirInfo{
-		LeftPath:  "/Users/juan/a",
-		RightPath: "/Users/juan/b",
-		Files:     make([]*DirEntry, 0),
-	}
-
-	e3 := d1.AppendDirectory("dir1")
-	d1.AppendEntry("file1")
-	d1.AppendEntry("file2")
-
-	e1 := d1.GetEntry(1)
-	e1.State = EQUALS
-	e1.Left.Type = FILE
-	e1.Right.Type = FILE
-
-	_, e2 := d1.FindEntry("file2")
-	e2.State = DIFFERENT
-	e1.Left.Type = FILE
-	e1.Right.Type = SYMLINK
-
-	e3.State = DIFFERENT
-	d2 := e3.Info
-	d2.AppendFile("a")
-	d2.AppendFile("b")
-
-	d1.Print()
-}
-
 func (d DirInfo) Print() {
 	d.PrintTab(0)
 }
@@ -141,11 +116,23 @@ func (d *DirInfo) GetEntry(i int) *DirEntry {
 	return d.Files[i]
 }
 
-func (d *DirEntry) GetInfo(isLeft bool) EntryInfo {
+func (d *DirEntry) GetInfo(isLeft bool) *EntryInfo {
 	if isLeft {
-		return d.Left
+		return &d.Left
 	} else {
-		return d.Right
+		return &d.Right
+	}
+}
+func (d *DirEntry) ConvertToDirectory(isLeft bool, parentDirInfo *DirInfo) {
+	info := d.GetInfo(isLeft)
+	info.Type = DIRECTORY
+
+	if d.Info == nil {
+		dirInfo := NewDirInfo()
+		dirInfo.Name = d.Name //TODO Se podria ahorrar repetir el name
+		dirInfo.LeftPath = fmt.Sprintf("%s%c%s", parentDirInfo.LeftPath, os.PathSeparator, d.Name)
+		dirInfo.RightPath = fmt.Sprintf("%s%c%s", parentDirInfo.RightPath, os.PathSeparator, d.Name)
+		d.Info = dirInfo
 	}
 }
 
@@ -197,4 +184,38 @@ func (d *DirInfo) AppendDirectory(name string) *DirEntry {
 
 	e.Info = &dirInfo
 	return &e
+}
+
+func NewDirInfo() *DirInfo {
+	d := DirInfo{
+		Files: make([]*DirEntry, 0),
+	}
+	return &d
+}
+
+func Prueba() {
+	d1 := NewDirInfo()
+	d1.LeftPath = "/Users/juan/a"
+	d1.RightPath = "/Users/juan/b"
+
+	e3 := d1.AppendDirectory("dir1")
+	d1.AppendEntry("file1")
+	d1.AppendEntry("file2")
+
+	e1 := d1.GetEntry(1)
+	e1.State = EQUALS
+	e1.Left.Type = FILE
+	e1.Right.Type = FILE
+
+	_, e2 := d1.FindEntry("file2")
+	e2.State = DIFFERENT
+	e1.Left.Type = FILE
+	e1.Right.Type = SYMLINK
+
+	e3.State = DIFFERENT
+	d2 := e3.Info
+	d2.AppendFile("a")
+	d2.AppendFile("b")
+
+	d1.Print()
 }

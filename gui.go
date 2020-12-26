@@ -89,7 +89,7 @@ func ModifyUI(label *ui.Label) {
 	}()
 }
 
-func main() {
+func Xmain() {
 	ui.InitLibrary()
 	defer ui.DeinitLibrary()
 

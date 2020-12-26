@@ -285,13 +285,13 @@ func (a *ArrayFlags) Set(value string) error {
 	return nil
 }
 
-func OLDmain() {
+func main() {
 	/*
 	outputPtr := flag.String("output", "", "file where to store the results")
 	flag.StringVar(outputPtr, "o", "", "file where to store the results")
 	checkPtr := flag.String("check", "", "file to check")
 	var exclusions ArrayFlags
-	flag.Var(&exclusions, "e", "regex that matches all files to be excluded. Can be set multiple times.")
+	flag.Var(&exclusions, "e", "fileExclusions that matches all files to be excluded. Can be set multiple times.")
 	flag.Parse()
 
 	if *checkPtr != "" {
@@ -300,5 +300,5 @@ func OLDmain() {
 		generate(exclusions)
 	}
 */
-	Prueba()
+	Prueba2()
 }
