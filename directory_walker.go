@@ -105,8 +105,10 @@ func (d *DirectoryWalker) Walk(directory string) {
 	d.ProcessDirectory(d.rootDirInfo, directory, isLeft)
 }
 
-func (d *DirectoryWalker) ProcessHashes(currentDirInfo *DirInfo) {
+func (d *DirectoryWalker) ProcessHashes(currentDirInfo *DirInfo) (int64,int64) {
 	allEqual := true
+	var totalSizeLeft int64 = 0
+	var totalSizeRight int64 = 0
 	for _,f := range currentDirInfo.Files {
 		if f.State == NOT_CHECKED_YET {
 			if f.Left.Type != f.Right.Type {
@@ -130,13 +132,18 @@ func (d *DirectoryWalker) ProcessHashes(currentDirInfo *DirInfo) {
 						f.State = EQUALS
 					}
 				case DIRECTORY:
-					d.ProcessHashes(f.Info)
+					sizeLeft, sizeRight := d.ProcessHashes(f.Info)
+					f.Left.Size = sizeLeft
+					f.Right.Size = sizeRight
 					f.State = f.Info.State
 					if f.State != EQUALS {
 						allEqual = false
 					}
 				}
 			}
+
+			totalSizeLeft = totalSizeLeft + f.Left.Size
+			totalSizeRight = totalSizeRight + f.Right.Size
 		}
 	}
 	if allEqual {
@@ -144,6 +151,9 @@ func (d *DirectoryWalker) ProcessHashes(currentDirInfo *DirInfo) {
 	} else {
 		currentDirInfo.State = DIFFERENT
 	}
+	currentDirInfo.Left.Size = totalSizeLeft
+	currentDirInfo.Right.Size = totalSizeRight
+	return totalSizeLeft, totalSizeRight
 }
 
 func Prueba2() *DirInfo {
@@ -151,8 +161,8 @@ func Prueba2() *DirInfo {
 	flags := ArrayFlags{}
 	flags.Set(".git")
 	w.SetExclusions(flags)
-	w.Walk("./a")
-	w.Walk("./b")
+	w.Walk(".")
+	w.Walk(".")
 	w.ProcessHashes(w.rootDirInfo)
 	w.rootDirInfo.Print()
 
