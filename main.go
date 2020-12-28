@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -14,7 +15,7 @@ FUNCIONES QUE FALTAN:
 X si hay un error de I/O o permisos que muestre la linea y el problema pero continue
 X que puedas poner multiples expressiones para excluir ficheros
 X que puedas decir que no siga los links simbolicos
-- apañar el check para que funcione con links simbolicos y multiples exclusiones
+X apañar el check para que funcione con links simbolicos y multiples exclusiones
 
 Modules structure
 https://golang.org/doc/code.html
@@ -285,8 +286,8 @@ func (a *ArrayFlags) Set(value string) error {
 	return nil
 }
 
-func main() {
-	/*
+func Xmain() {
+
 	outputPtr := flag.String("output", "", "file where to store the results")
 	flag.StringVar(outputPtr, "o", "", "file where to store the results")
 	checkPtr := flag.String("check", "", "file to check")
@@ -299,6 +300,6 @@ func main() {
 	} else {
 		generate(exclusions)
 	}
-*/
-	Prueba2()
+
+	//Prueba2()
 }

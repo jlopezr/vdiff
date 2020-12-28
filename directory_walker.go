@@ -23,14 +23,14 @@ func (d *DirectoryWalker) SetExclusions(exclusions ArrayFlags) {
 }
 
 func (d *DirectoryWalker) CreateRootDirInfo(directory string) bool {
+	cwd, err := os.Getwd()
+	if err != nil {
+		panic("cannot get current directory")
+	}
+
 	if d.rootDirInfo == nil {
 		d.rootDirInfo = NewDirInfo()
 		d.rootDirInfo.Name = "."
-
-		cwd, err := os.Getwd()
-		if err != nil {
-			panic("cannot get current directory")
-		}
 
 		//TODO Check if it is directory
 		d.rootDirInfo.Left.Type = DIRECTORY
@@ -42,7 +42,7 @@ func (d *DirectoryWalker) CreateRootDirInfo(directory string) bool {
 		}
 		//TODO Check if it is directory
 		d.rootDirInfo.Right.Type = DIRECTORY
-		d.rootDirInfo.RightPath = directory
+		d.rootDirInfo.RightPath = filepath.Join(cwd, directory)
 		return false
 	}
 }
@@ -63,7 +63,7 @@ func (d *DirectoryWalker) ProcessDirectory(currentDirInfo *DirInfo, directory st
 		}
 
 		info, err := os.Lstat(fileName)
-		entry := currentDirInfo.AppendFile(name)
+		entry := currentDirInfo.FindOrAppendEntry(name)
 		details := entry.GetInfo(isLeft)
 		if err != nil {
 			// Error
@@ -105,11 +105,56 @@ func (d *DirectoryWalker) Walk(directory string) {
 	d.ProcessDirectory(d.rootDirInfo, directory, isLeft)
 }
 
-func Prueba2() {
+func (d *DirectoryWalker) ProcessHashes(currentDirInfo *DirInfo) {
+	allEqual := true
+	for _,f := range currentDirInfo.Files {
+		if f.State == NOT_CHECKED_YET {
+			if f.Left.Type != f.Right.Type {
+				f.State = DIFFERENT
+				allEqual = false
+			} else {
+				switch f.Left.Type {
+				case FILE:
+					if f.Left.Size != f.Right.Size {
+						f.State = DIFFERENT
+						allEqual = false
+					} else {
+						//TODO Calculate Hash
+						f.State = EQUALS
+					}
+				case SYMLINK:
+					if f.Left.Hash != f.Right.Hash {
+						f.State = DIFFERENT
+						allEqual = false
+					} else {
+						f.State = EQUALS
+					}
+				case DIRECTORY:
+					d.ProcessHashes(f.Info)
+					f.State = f.Info.State
+					if f.State != EQUALS {
+						allEqual = false
+					}
+				}
+			}
+		}
+	}
+	if allEqual {
+		currentDirInfo.State = EQUALS
+	} else {
+		currentDirInfo.State = DIFFERENT
+	}
+}
+
+func Prueba2() *DirInfo {
 	w := DirectoryWalker{}
 	flags := ArrayFlags{}
 	flags.Set(".git")
 	w.SetExclusions(flags)
-	w.Walk(".")
+	w.Walk("./a")
+	w.Walk("./b")
+	w.ProcessHashes(w.rootDirInfo)
 	w.rootDirInfo.Print()
+
+	return w.rootDirInfo
 }

@@ -13,8 +13,9 @@ const (
 	UNKNOWN EntryType = iota
 	FILE
 	DIRECTORY
+	UPDIR
 	SYMLINK
-	NOT_EXIST
+	NOT_EXIST	//TODO Seems that UNKNOWN is used for this
 	ERROR
 	ERROR_FILE
 	ERROR_DIRECTORY
@@ -25,8 +26,13 @@ var entries = [...]string{
 	"UNKNOWN",
 	"FILE",
 	"DIRECTORY",
+	"UPDIR",
 	"SYMLINK",
 	"NOT_EXIST",
+	"ERROR",
+	"ERROR_FILE",
+	"ERROR_DIRECTORY",
+	"ERROR_SYMLINK",
 }
 
 func (t EntryType) String() string {
@@ -78,7 +84,8 @@ type DirEntry struct {
 	Info *DirInfo
 }
 
-//Quiza podemos usar una estructura diferente si sabemos que ninguno de los dos lados es un directorio y ahorrar 1 puntero
+//TODO Quiza podemos usar una estructura diferente si sabemos que ninguno de los dos lados es un directorio
+//y ahorrar 1 puntero
 type FileEntry struct {
 	GenericInfo
 }
@@ -132,7 +139,19 @@ func (d *DirEntry) ConvertToDirectory(isLeft bool, parentDirInfo *DirInfo) {
 		dirInfo.Name = d.Name //TODO Se podria ahorrar repetir el name
 		dirInfo.LeftPath = fmt.Sprintf("%s%c%s", parentDirInfo.LeftPath, os.PathSeparator, d.Name)
 		dirInfo.RightPath = fmt.Sprintf("%s%c%s", parentDirInfo.RightPath, os.PathSeparator, d.Name)
+
+		updir := dirInfo.AppendEntry("..")
+		updir.Left.Type = UPDIR
+		updir.Right.Type = UPDIR
+		updir.State = EQUALS
+		updir.Info = parentDirInfo
+
 		d.Info = dirInfo
+	} else {
+		//TODO Se podria calcular el path siguiendo los updir?
+		// Update directory path
+		d.Info.LeftPath = fmt.Sprintf("%s%c%s", parentDirInfo.LeftPath, os.PathSeparator, d.Name)
+		d.Info.RightPath = fmt.Sprintf("%s%c%s", parentDirInfo.RightPath, os.PathSeparator, d.Name)
 	}
 }
 
@@ -151,39 +170,22 @@ func (d *DirInfo) AppendEntry(name string) *DirEntry {
 	e.State = NOT_CHECKED_YET
 	e.Left.Type = UNKNOWN
 	e.Right.Type = UNKNOWN
-	e.Left.Hash = fmt.Sprintf("HASH1-%s", name)
-	e.Right.Hash = fmt.Sprintf("HASH2-%s", name)
 	d.Files = append(d.Files, &e)
 	return &e
 }
 
-func (d *DirInfo) AppendFile(name string) *DirEntry {
-	e := DirEntry{}
-	e.Name = name
-	e.State = NOT_CHECKED_YET
-	e.Left.Type = FILE
-	e.Right.Type = UNKNOWN
-	e.Left.Hash = fmt.Sprintf("HASH1-%s", name)
-	d.Files = append(d.Files, &e)
-	return &e
-}
-
-func (d *DirInfo) AppendDirectory(name string) *DirEntry {
-	e := DirEntry{}
-	e.Name = name
-	e.State = NOT_CHECKED_YET
-	e.Left.Type = DIRECTORY
-	e.Right.Type = UNKNOWN
-	e.Left.Hash = fmt.Sprintf("HASH1-%s", name)
-	d.Files = append(d.Files, &e)
-
-	dirInfo := DirInfo{}
-	dirInfo.Name = name //TODO Se podria ahorrar repetir el name
-	dirInfo.LeftPath = fmt.Sprintf("%s%c%s", d.LeftPath, os.PathSeparator, name)
-	dirInfo.RightPath = fmt.Sprintf("%s%c%s", d.RightPath, os.PathSeparator, name)
-
-	e.Info = &dirInfo
-	return &e
+func (d *DirInfo) FindOrAppendEntry(name string) *DirEntry {
+	/* TODO no se puede usar busqueda binaria porque no esta ordenado todavia
+	i := sort.Search(len(d.Files), func(i int) bool {
+		return name <= d.Files[i].Name
+	})
+	*/
+	_, entry := d.FindEntry(name)
+	if entry == nil {
+		return d.AppendEntry(name)
+	} else {
+		return entry
+	}
 }
 
 func NewDirInfo() *DirInfo {
@@ -193,6 +195,7 @@ func NewDirInfo() *DirInfo {
 	return &d
 }
 
+/*
 func Prueba() {
 	d1 := NewDirInfo()
 	d1.LeftPath = "/Users/juan/a"
@@ -219,3 +222,4 @@ func Prueba() {
 
 	d1.Print()
 }
+*/

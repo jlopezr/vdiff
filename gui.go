@@ -24,12 +24,12 @@ func createDirInfo() DirInfo {
 	return dir
 }
 
-func createPanel(view ui.Control, dirinfo DirInfo, isLeft bool) *ui.TableView {
+func createPanel(view ui.Control, state *PanelState, isLeft bool) *ui.TableView {
 	panel := ui.CreateTableView(view, 25, 12, 1)
 
 	panel.SetShowLines(true)
 	panel.SetShowRowNumber(false)
-	panel.SetRowCount(dirinfo.EntryCount())
+	panel.SetRowCount(state.currentDirInfo.EntryCount())
 
 	cols := []ui.Column{
 		ui.Column{Title: "Filename", Width: 25, Alignment: ui.AlignLeft},
@@ -41,11 +41,17 @@ func createPanel(view ui.Control, dirinfo DirInfo, isLeft bool) *ui.TableView {
 	panel.SetFullRowSelect(true)
 
 	panel.OnDrawCell(func(info *ui.ColumnDrawInfo) {
+		if isLeft {
+			info.Bg = term.ColorDefault
+		} else {
+			info.Bg = term.ColorDefault
+		}
+
 		if info.RowSelected {
 			info.Bg = term.ColorLightGray
 			info.Fg = term.ColorRed
 		}
-		entry := dirinfo.GetEntry(info.Row)
+		entry := state.currentDirInfo.GetEntry(info.Row)
 		switch info.Col {
 		case 0:
 			info.Text = entry.Name
@@ -79,21 +85,34 @@ func ModifyUI(label *ui.Label) {
 				label.SetTitle(fmt.Sprintf("%d sec", i))
 				i++
 				ui.RefreshScreen()
-				ev := ui.Event{
-					Type: ui.EventRedraw, // ui.EventChanged
-
+				/*ev := ui.Event{
+					// label.Draw() directamente no va
+					// ui.EventChanged parece que no esta implementado
+					// ui.EventRedraw se puede mandar a toda la pantalla (sin poner Target)
+					// si pones el target parece que hace lo mismo :(
+					// ui.RefreshScreen() parece que tambien pone el evento
+					Type: ui.EventRedraw,
+					Target: label,
 				}
 				ui.PutEvent(ev)
+				*/
 			}
 		}
 	}()
 }
 
-func Xmain() {
+type PanelState struct {
+	currentDirInfo *DirInfo
+}
+
+func main() {
 	ui.InitLibrary()
 	defer ui.DeinitLibrary()
 
-	dirinfo := createDirInfo()
+	state := PanelState{
+		//currentDirInfo: createDirInfo(),
+		currentDirInfo: Prueba2(),
+	}
 
 	window := ui.AddWindow(0, 0, 0, 2, "<c:bright blue>Dirdiff 0.1<c:default>")
 	window.SetAlign(ui.AlignCenter)
@@ -107,8 +126,8 @@ func Xmain() {
 	frameBottom := ui.CreateFrame(window, ui.AutoSize, 1, ui.BorderNone, ui.Fixed)
 	frameBottom.SetPack(ui.Horizontal)
 
-	left := createPanel(frameTop, dirinfo, true)
-	right := createPanel(frameTop, dirinfo, false)
+	left := createPanel(frameTop, &state, true)
+	right := createPanel(frameTop, &state, false)
 
 	label1 := ui.CreateLabel(frameBottom, ui.AutoSize, ui.AutoSize, "HELLO", 1)
 	label1.SetAlign(ui.AlignCenter)
@@ -128,11 +147,42 @@ func Xmain() {
 	left.OnSelectCell(func(x int, y int) {
 		right.SetSelectedRow(y)
 		label1.SetTitle(fmt.Sprintf("%d - %d", x, y))
+
 	})
+
+	j := 0
 
 	right.OnSelectCell(func(x int, y int) {
 		left.SetSelectedRow(y)
-		label2.SetTitle(fmt.Sprintf("%d - %d", x, y))
+		label2.SetTitle(fmt.Sprintf("%d - %d => %d", x, y, j))
+		j++
+	})
+
+	/*
+	left.OnKeyPress(func(key term.Key) bool {
+		if key == term.KeyEnter {
+			label2.SetTitle("ENTER PRESS!")
+		}
+		return false
+	})
+	*/
+
+	left.OnAction(func(event ui.TableEvent) {
+		if event.Action == ui.TableActionEdit {
+			entry := state.currentDirInfo.Files[event.Row]
+			label2.SetTitle(fmt.Sprintf("TABLE EVENT: %d C:%d R:%d [%s]", event.Action, event.Col, event.Row, entry.Name))
+			if entry.Left.Type == DIRECTORY || entry.Right.Type == DIRECTORY || entry.Left.Type == UPDIR || entry.Right.Type == UPDIR {
+				//TODO Move this code to a function
+				state.currentDirInfo = entry.Info
+				left.SetRowCount(state.currentDirInfo.EntryCount())
+				left.SetSelectedCol(0)
+				left.SetSelectedRow(0)
+				right.SetRowCount(state.currentDirInfo.EntryCount())
+				right.SetSelectedCol(0)
+				right.SetSelectedRow(0)
+				ui.RefreshScreen() //TODO Only refresh left and right panel
+			}
+		}
 	})
 
 	/*
@@ -148,7 +198,8 @@ func Xmain() {
 		})
 	*/
 
-	go ModifyUI(label1)
+	//Example of goroutine modifying UI
+	//go ModifyUI(label1)
 
 	ui.MainLoop()
 }
