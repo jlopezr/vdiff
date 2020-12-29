@@ -256,7 +256,7 @@ func (f *FileExclusions) MatchString(txt string) bool {
 }
 
 func CreateFileExclusions(a ArrayFlags) *FileExclusions {
-	result := &FileExclusions {}
+	result := &FileExclusions{}
 
 	for _, f := range a {
 		//replace all . -> \.
@@ -266,8 +266,8 @@ func CreateFileExclusions(a ArrayFlags) *FileExclusions {
 
 		regex, err := regexp.Compile(tmp)
 		if err != nil {
-				panic(err)
-			}
+			panic(err)
+		}
 
 		result.regex = append(result.regex, *regex)
 	}
@@ -278,7 +278,7 @@ func CreateFileExclusions(a ArrayFlags) *FileExclusions {
 type ArrayFlags []string
 
 func (a *ArrayFlags) String() string {
-	return strings.Join(*a,",")
+	return strings.Join(*a, ",")
 }
 
 func (a *ArrayFlags) Set(value string) error {
@@ -300,6 +300,4 @@ func Xmain() {
 	} else {
 		generate(exclusions)
 	}
-
-	//Prueba2()
 }

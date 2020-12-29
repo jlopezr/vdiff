@@ -6,23 +6,8 @@ import (
 	term "github.com/nsf/termbox-go"
 	"strconv"
 	"time"
-
 	//term "github.com/nsf/termbox-go"
 )
-
-func createDirInfo() DirInfo {
-	dir := DirInfo{
-		LeftPath:  "/Users/juan/a",
-		RightPath: "/Users/juan/b",
-		Files:     make([]*DirEntry, 0),
-	}
-
-	for i := 0; i < 50; i++ {
-		dir.AppendEntry(fmt.Sprintf("Item %d", i))
-	}
-
-	return dir
-}
 
 func createPanel(view ui.Control, state *PanelState, isLeft bool) *ui.TableView {
 	panel := ui.CreateTableView(view, 25, 12, 1)
@@ -41,20 +26,41 @@ func createPanel(view ui.Control, state *PanelState, isLeft bool) *ui.TableView 
 	panel.SetFullRowSelect(true)
 
 	panel.OnDrawCell(func(info *ui.ColumnDrawInfo) {
-		if isLeft {
-			info.Bg = term.ColorDefault
-		} else {
-			info.Bg = term.ColorDefault
-		}
-
 		if info.RowSelected {
 			info.Bg = term.ColorLightGray
-			info.Fg = term.ColorRed
 		}
 		entry := state.currentDirInfo.GetEntry(info.Row)
+		var icon string
+
+		switch entry.GetInfo(isLeft).Type {
+		case UNKNOWN:
+			info.Fg = term.ColorLightGreen
+			icon = " "
+			break
+		case FILE:
+			icon = "·"
+		case SYMLINK:
+			icon = "!"
+			info.Fg = term.ColorLightGray
+			break
+		case DIRECTORY:
+			icon = "+"
+			info.Fg = term.ColorLightGray
+			break
+		case ERROR:
+		case ERROR_FILE:
+		case ERROR_DIRECTORY:
+		case ERROR_SYMLINK:
+			icon = "?"
+			info.Fg = term.ColorLightRed
+			break
+		case UPDIR:
+			icon = " "
+		}
+
 		switch info.Col {
 		case 0:
-			info.Text = entry.Name
+			info.Text = icon + entry.Name
 			break
 		case 1:
 			info.Text = entry.GetInfo(isLeft).Hash
@@ -76,7 +82,7 @@ func ModifyUI(label *ui.Label) {
 	ticker := time.NewTicker(1000 * time.Millisecond)
 	done := make(chan bool)
 	go func() {
-		i:=1
+		i := 1
 		for {
 			select {
 			case <-done:
@@ -110,8 +116,7 @@ func main() {
 	defer ui.DeinitLibrary()
 
 	state := PanelState{
-		//currentDirInfo: createDirInfo(),
-		currentDirInfo: Prueba2(),
+		currentDirInfo: CreateRootDirInfo(),
 	}
 
 	window := ui.AddWindow(0, 0, 0, 2, "<c:bright blue>Dirdiff 0.1<c:default>")
@@ -159,12 +164,12 @@ func main() {
 	})
 
 	/*
-	left.OnKeyPress(func(key term.Key) bool {
-		if key == term.KeyEnter {
-			label2.SetTitle("ENTER PRESS!")
-		}
-		return false
-	})
+		left.OnKeyPress(func(key term.Key) bool {
+			if key == term.KeyEnter {
+				label2.SetTitle("ENTER PRESS!")
+			}
+			return false
+		})
 	*/
 
 	left.OnAction(func(event ui.TableEvent) {

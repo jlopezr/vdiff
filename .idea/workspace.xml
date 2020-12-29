@@ -3,7 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="2167a955-3067-42f5-8074-ec59398dc887" name="Default Changelist" comment="New data structures">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dir_info.go" beforeDir="false" afterPath="$PROJECT_DIR$/dir_info.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/directory_walker.go" beforeDir="false" afterPath="$PROJECT_DIR$/directory_walker.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gui.go" beforeDir="false" afterPath="$PROJECT_DIR$/gui.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -81,13 +84,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/gui.go</url>
-          <line>175</line>
+          <line>180</line>
           <option name="timeStamp" value="44" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/directory_walker.go</url>
-          <line>108</line>
-          <option name="timeStamp" value="57" />
+          <url>file://$PROJECT_DIR$/gui.go</url>
+          <line>32</line>
+          <option name="timeStamp" value="61" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

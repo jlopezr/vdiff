@@ -15,7 +15,7 @@ const (
 	DIRECTORY
 	UPDIR
 	SYMLINK
-	NOT_EXIST	//TODO Seems that UNKNOWN is used for this
+	NOT_EXIST //TODO Seems that UNKNOWN is used for this
 	ERROR
 	ERROR_FILE
 	ERROR_DIRECTORY
@@ -194,32 +194,3 @@ func NewDirInfo() *DirInfo {
 	}
 	return &d
 }
-
-/*
-func Prueba() {
-	d1 := NewDirInfo()
-	d1.LeftPath = "/Users/juan/a"
-	d1.RightPath = "/Users/juan/b"
-
-	e3 := d1.AppendDirectory("dir1")
-	d1.AppendEntry("file1")
-	d1.AppendEntry("file2")
-
-	e1 := d1.GetEntry(1)
-	e1.State = EQUALS
-	e1.Left.Type = FILE
-	e1.Right.Type = FILE
-
-	_, e2 := d1.FindEntry("file2")
-	e2.State = DIFFERENT
-	e1.Left.Type = FILE
-	e1.Right.Type = SYMLINK
-
-	e3.State = DIFFERENT
-	d2 := e3.Info
-	d2.AppendFile("a")
-	d2.AppendFile("b")
-
-	d1.Print()
-}
-*/

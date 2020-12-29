@@ -11,7 +11,6 @@ import (
 type DirectoryWalker struct {
 	fileExclusions   *FileExclusions
 	rootDirInfo      *DirInfo
-	//currentDirInfo   *DirInfo
 	totalFiles       int
 	totalDirectories int
 }
@@ -105,11 +104,11 @@ func (d *DirectoryWalker) Walk(directory string) {
 	d.ProcessDirectory(d.rootDirInfo, directory, isLeft)
 }
 
-func (d *DirectoryWalker) ProcessHashes(currentDirInfo *DirInfo) (int64,int64) {
+func (d *DirectoryWalker) ProcessHashes(currentDirInfo *DirInfo) (int64, int64) {
 	allEqual := true
 	var totalSizeLeft int64 = 0
 	var totalSizeRight int64 = 0
-	for _,f := range currentDirInfo.Files {
+	for _, f := range currentDirInfo.Files {
 		if f.State == NOT_CHECKED_YET {
 			if f.Left.Type != f.Right.Type {
 				f.State = DIFFERENT
@@ -156,15 +155,15 @@ func (d *DirectoryWalker) ProcessHashes(currentDirInfo *DirInfo) (int64,int64) {
 	return totalSizeLeft, totalSizeRight
 }
 
-func Prueba2() *DirInfo {
+func CreateRootDirInfo() *DirInfo {
 	w := DirectoryWalker{}
 	flags := ArrayFlags{}
 	flags.Set(".git")
 	w.SetExclusions(flags)
-	w.Walk(".")
-	w.Walk(".")
+	w.Walk("./a")
+	w.Walk("./b")
 	w.ProcessHashes(w.rootDirInfo)
-	w.rootDirInfo.Print()
+	//w.rootDirInfo.Print()
 
 	return w.rootDirInfo
 }
