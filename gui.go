@@ -5,7 +5,6 @@ import (
 	ui "github.com/VladimirMarkelov/clui"
 	term "github.com/nsf/termbox-go"
 	"strconv"
-	"time"
 	//term "github.com/nsf/termbox-go"
 )
 
@@ -77,31 +76,24 @@ func createPanel(view ui.Control, state *PanelState, isLeft bool) *ui.TableView 
 	return panel
 }
 
-func ModifyUI(label *ui.Label) {
+func CalculateHashes(label *ui.Label, dirInfo *DirInfo) {
+	h := NewHasherWalker()
+	go h.Walk(dirInfo)
 
-	ticker := time.NewTicker(1000 * time.Millisecond)
-	done := make(chan bool)
 	go func() {
-		i := 1
 		for {
 			select {
-			case <-done:
-				return
-			case _ = <-ticker.C:
-				label.SetTitle(fmt.Sprintf("%d sec", i))
-				i++
+			case <-h.done:
+				label.SetTitle("DONE!!!")
 				ui.RefreshScreen()
-				/*ev := ui.Event{
-					// label.Draw() directamente no va
-					// ui.EventChanged parece que no esta implementado
-					// ui.EventRedraw se puede mandar a toda la pantalla (sin poner Target)
-					// si pones el target parece que hace lo mismo :(
-					// ui.RefreshScreen() parece que tambien pone el evento
-					Type: ui.EventRedraw,
-					Target: label,
-				}
-				ui.PutEvent(ev)
-				*/
+				return
+			case msg := <-h.msg:
+				label.SetTitle(msg.dirInfo.LeftPath + "/" + msg.name)
+				//TODO Aqui o en el hasher
+				_, entry := msg.dirInfo.FindEntry(msg.name)
+				entry.Left.Hash = msg.leftHash
+				entry.Right.Hash = msg.rightHash
+				ui.RefreshScreen()
 			}
 		}
 	}()
@@ -203,8 +195,7 @@ func main() {
 		})
 	*/
 
-	//Example of goroutine modifying UI
-	//go ModifyUI(label1)
+	CalculateHashes(label1, state.currentDirInfo)
 
 	ui.MainLoop()
 }
