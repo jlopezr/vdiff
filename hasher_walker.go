@@ -2,7 +2,6 @@ package main
 
 import (
 	"path/filepath"
-	"time"
 )
 
 type HasherWalker struct {
@@ -44,8 +43,6 @@ func (h *HasherWalker) ProcessDirectory(dirInfo *DirInfo) (string, string) {
 	//TODO si el status ya es DIFFERENT no hace falta calcular hash
 
 	for _, f := range dirInfo.Files {
-		time.Sleep(1 * time.Second)
-
 		var leftHash string
 		var rightHash string
 
@@ -84,6 +81,15 @@ func (h *HasherWalker) ProcessDirectory(dirInfo *DirInfo) (string, string) {
 		}
 
 		//TODO Si es un Updir los dos hash son "" y no se deberia enviar
+
+		// Update hash in dirInfo structure
+		_, entry := dirInfo.FindEntry(f.Name)
+		if leftHash != "" {
+			entry.Left.Hash = leftHash
+		}
+		if rightHash != "" {
+			entry.Right.Hash = rightHash
+		}
 
 		result := HashResult{
 			dirInfo:   dirInfo,

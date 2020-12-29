@@ -89,10 +89,6 @@ func CalculateHashes(label *ui.Label, dirInfo *DirInfo) {
 				return
 			case msg := <-h.msg:
 				label.SetTitle(msg.dirInfo.LeftPath + "/" + msg.name)
-				//TODO Aqui o en el hasher
-				_, entry := msg.dirInfo.FindEntry(msg.name)
-				entry.Left.Hash = msg.leftHash
-				entry.Right.Hash = msg.rightHash
 				ui.RefreshScreen()
 			}
 		}
