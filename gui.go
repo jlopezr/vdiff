@@ -99,12 +99,12 @@ type PanelState struct {
 	currentDirInfo *DirInfo
 }
 
-func main() {
+func gui(dir1 string, dir2 string, exclusions ArrayFlags) {
 	ui.InitLibrary()
 	defer ui.DeinitLibrary()
 
 	state := PanelState{
-		currentDirInfo: CreateRootDirInfo(),
+		currentDirInfo: CreateRootDirInfo(dir1,dir2,exclusions),
 	}
 
 	window := ui.AddWindow(0, 0, 0, 2, "<c:bright blue>Dirdiff 0.1<c:default>")

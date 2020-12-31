@@ -155,13 +155,12 @@ func (d *DirectoryWalker) ProcessHashes(currentDirInfo *DirInfo) (int64, int64) 
 	return totalSizeLeft, totalSizeRight
 }
 
-func CreateRootDirInfo() *DirInfo {
+func CreateRootDirInfo(dir1 string, dir2 string, exclusions ArrayFlags) *DirInfo {
 	w := DirectoryWalker{}
-	flags := ArrayFlags{}
-	flags.Set(".git")
-	w.SetExclusions(flags)
-	w.Walk("./a")
-	w.Walk("./b")
+
+	w.SetExclusions(exclusions)
+	w.Walk(dir1)
+	w.Walk(dir2)
 	w.ProcessHashes(w.rootDirInfo)
 	//w.rootDirInfo.Print()
 

@@ -51,7 +51,7 @@ func (h *HasherWalker) ProcessDirectory(dirInfo *DirInfo) (string, string) {
 			leftHash, rightHash = h.ProcessDirectory(f.Info)
 			break
 		case FILE:
-			leftHash, _ = hashFileMd5(filepath.Join(dirInfo.LeftPath,f.Name))
+			leftHash, _ = hashFileMd5(filepath.Join(dirInfo.LeftPath, f.Name))
 			break
 		case SYMLINK:
 		case ERROR:
@@ -69,7 +69,7 @@ func (h *HasherWalker) ProcessDirectory(dirInfo *DirInfo) (string, string) {
 			}
 			break
 		case FILE:
-			rightHash, _ = hashFileMd5(filepath.Join(dirInfo.RightPath,f.Name))
+			rightHash, _ = hashFileMd5(filepath.Join(dirInfo.RightPath, f.Name))
 			break
 		case SYMLINK:
 		case ERROR:
@@ -99,7 +99,7 @@ func (h *HasherWalker) ProcessDirectory(dirInfo *DirInfo) (string, string) {
 		}
 		h.msg <- result
 
-		directoryLeftHash = leftHash // TODO Calculate accumulated hash for directory
+		directoryLeftHash = leftHash   // TODO Calculate accumulated hash for directory
 		directoryRightHash = rightHash // TODO Calculate accumulated hash for directory
 	}
 	return directoryLeftHash, directoryRightHash

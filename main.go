@@ -286,10 +286,13 @@ func (a *ArrayFlags) Set(value string) error {
 	return nil
 }
 
-func Xmain() {
+func main() {
 
 	outputPtr := flag.String("output", "", "file where to store the results")
 	flag.StringVar(outputPtr, "o", "", "file where to store the results")
+
+	generatePtr := flag.Bool("generate", false, "generate list of hashes")
+	flag.BoolVar(generatePtr, "g", false, "generate list of hashes")
 	checkPtr := flag.String("check", "", "file to check")
 	var exclusions ArrayFlags
 	flag.Var(&exclusions, "e", "fileExclusions that matches all files to be excluded. Can be set multiple times.")
@@ -297,7 +300,15 @@ func Xmain() {
 
 	if *checkPtr != "" {
 		check(*checkPtr)
-	} else {
+	} else if *generatePtr {
 		generate(exclusions)
+	} else {
+		if flag.NArg() == 2 {
+			gui(flag.Arg(0), flag.Arg(1), exclusions)
+		} else {
+			println("Visual mode requires two arguments. Exiting.")
+			os.Exit(-1)
+		}
+
 	}
 }

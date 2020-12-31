@@ -3,8 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="2167a955-3067-42f5-8074-ec59398dc887" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/directory_walker.go" beforeDir="false" afterPath="$PROJECT_DIR$/directory_walker.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fileSelectDialog.go" beforeDir="false" afterPath="$PROJECT_DIR$/fileSelectDialog.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gui.go" beforeDir="false" afterPath="$PROJECT_DIR$/gui.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/hasher_walker.go" beforeDir="false" afterPath="$PROJECT_DIR$/hasher_walker.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,7 +51,7 @@
     <configuration name="go build dirdiff" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="dirdiff" />
       <working_directory value="$PROJECT_DIR$" />
-      <parameters value="-e .git -e .idea" />
+      <parameters value="-e .git -e .idea ./b ./b" />
       <kind value="PACKAGE" />
       <filePath value="$PROJECT_DIR$/main.go" />
       <package value="dirdiff" />
@@ -83,13 +86,8 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/gui.go</url>
-          <line>90</line>
-          <option name="timeStamp" value="67" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/gui.go</url>
-          <line>86</line>
-          <option name="timeStamp" value="68" />
+          <line>102</line>
+          <option name="timeStamp" value="69" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

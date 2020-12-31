@@ -94,6 +94,6 @@ func mainLoop2() {
 	ui.MainLoop()
 }
 
-func main() {
+func mainXX() {
 	mainLoop2()
 }
