@@ -57,7 +57,7 @@ func (d *DirectoryWalker) ProcessDirectory(currentDirInfo *DirInfo, directory st
 	for _, name := range list {
 		fileName := filepath.Join(file.Name(), name)
 
-		if d.fileExclusions.MatchString(fileName) {
+		if d.fileExclusions != nil && d.fileExclusions.MatchString(fileName) {
 			continue
 		}
 
