@@ -5,7 +5,6 @@ import (
 	ui "github.com/VladimirMarkelov/clui"
 	term "github.com/nsf/termbox-go"
 	"strconv"
-	//term "github.com/nsf/termbox-go"
 )
 
 func createPanel(view ui.Control, state *PanelState, isLeft bool) *ui.TableView {
@@ -33,29 +32,42 @@ func createPanel(view ui.Control, state *PanelState, isLeft bool) *ui.TableView 
 
 		switch entry.GetInfo(isLeft).Type {
 		case UNKNOWN:
-			info.Fg = term.ColorLightGreen
-			icon = " "
-			break
+			info.Text = ""
+			return
 		case FILE:
 			icon = "·"
 		case SYMLINK:
 			icon = "!"
-			info.Fg = term.ColorLightGray
+			//info.Fg = term.ColorLightGray
 			break
 		case DIRECTORY:
 			icon = "+"
-			info.Fg = term.ColorLightGray
+			//info.Fg = term.ColorLightGray
 			break
 		case ERROR:
 		case ERROR_FILE:
 		case ERROR_DIRECTORY:
 		case ERROR_SYMLINK:
 			icon = "?"
-			info.Fg = term.ColorLightRed
+			info.Fg = term.ColorYellow
+			info.Bg = term.ColorLightRed
 			break
 		case UPDIR:
 			icon = " "
 		}
+
+		switch entry.State {
+		case DIFFERENT:
+			info.Fg = term.ColorRed
+			break
+		case MISSING_LEFT:
+			info.Fg = term.ColorRed
+			break
+		case MISSING_RIGHT:
+			info.Fg = term.ColorRed
+			break
+		}
+
 
 		switch info.Col {
 		case 0:
@@ -164,6 +176,24 @@ func gui(dir1 string, dir2 string, exclusions ArrayFlags) {
 		if event.Action == ui.TableActionEdit {
 			entry := state.currentDirInfo.Files[event.Row]
 			label2.SetTitle(fmt.Sprintf("TABLE EVENT: %d C:%d R:%d [%s]", event.Action, event.Col, event.Row, entry.Name))
+			if entry.Left.Type == DIRECTORY || entry.Right.Type == DIRECTORY || entry.Left.Type == UPDIR || entry.Right.Type == UPDIR {
+				//TODO Move this code to a function
+				state.currentDirInfo = entry.Info
+				left.SetRowCount(state.currentDirInfo.EntryCount())
+				left.SetSelectedCol(0)
+				left.SetSelectedRow(0)
+				right.SetRowCount(state.currentDirInfo.EntryCount())
+				right.SetSelectedCol(0)
+				right.SetSelectedRow(0)
+				ui.RefreshScreen() //TODO Only refresh left and right panel
+			}
+		}
+	})
+
+	right.OnAction(func(event ui.TableEvent) {
+		if event.Action == ui.TableActionEdit {
+			entry := state.currentDirInfo.Files[event.Row]
+			label1.SetTitle(fmt.Sprintf("TABLE EVENT: %d C:%d R:%d [%s]", event.Action, event.Col, event.Row, entry.Name))
 			if entry.Left.Type == DIRECTORY || entry.Right.Type == DIRECTORY || entry.Left.Type == UPDIR || entry.Right.Type == UPDIR {
 				//TODO Move this code to a function
 				state.currentDirInfo = entry.Info

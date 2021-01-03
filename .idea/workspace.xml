@@ -2,7 +2,24 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2167a955-3067-42f5-8074-ec59398dc887" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/tests/a/different/dir1/file3.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/a/different/file2.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/a/different/file5.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/a/different/only_a.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/a/different/only_a_dir/file4.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/a/equals/empty_file" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/a/equals/file1.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/b/different/dir1/file3.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/b/different/file2.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/b/different/file5.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/b/different/only_b.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/b/different/only_b_dir/file4.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/b/equals/empty_file" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/b/equals/file1.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/directory_walker.go" beforeDir="false" afterPath="$PROJECT_DIR$/directory_walker.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gui.go" beforeDir="false" afterPath="$PROJECT_DIR$/gui.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hasher_walker.go" beforeDir="false" afterPath="$PROJECT_DIR$/hasher_walker.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,7 +63,7 @@
     <configuration name="go build dirdiff" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="dirdiff" />
       <working_directory value="$PROJECT_DIR$" />
-      <parameters value="-e .git -e .idea ./b ./b" />
+      <parameters value="-e .git -e .idea ./tests/a ./tests/b" />
       <kind value="PACKAGE" />
       <filePath value="$PROJECT_DIR$/main.go" />
       <package value="dirdiff" />
@@ -78,11 +95,6 @@
           <url>file://$PROJECT_DIR$/../../pkg/mod/github.com/!vladimir!markelov/clui@v1.2.1/tableview.go</url>
           <line>710</line>
           <option name="timeStamp" value="30" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/gui.go</url>
-          <line>102</line>
-          <option name="timeStamp" value="69" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

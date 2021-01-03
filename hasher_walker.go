@@ -91,6 +91,10 @@ func (h *HasherWalker) ProcessDirectory(dirInfo *DirInfo) (string, string) {
 			entry.Right.Hash = rightHash
 		}
 
+		/*if leftHash != rightHash {
+			entry.State = DIFFERENT
+		}*/
+
 		result := HashResult{
 			dirInfo:   dirInfo,
 			name:      f.Name,

@@ -90,10 +90,8 @@ func (d *DirectoryWalker) ProcessDirectory(currentDirInfo *DirInfo, directory st
 			} else {
 				// File
 				details.Type = FILE
-				details.Hash = fmt.Sprintf("HASH-%s", fileName)
 				details.Size = info.Size()
 				details.LastModification = info.ModTime()
-				//TODO Hash
 			}
 		}
 	}
@@ -109,6 +107,7 @@ func (d *DirectoryWalker) ProcessHashes(currentDirInfo *DirInfo) (int64, int64) 
 	var totalSizeLeft int64 = 0
 	var totalSizeRight int64 = 0
 	for _, f := range currentDirInfo.Files {
+
 		if f.State == NOT_CHECKED_YET {
 			if f.Left.Type != f.Right.Type {
 				f.State = DIFFERENT
@@ -120,8 +119,8 @@ func (d *DirectoryWalker) ProcessHashes(currentDirInfo *DirInfo) (int64, int64) 
 						f.State = DIFFERENT
 						allEqual = false
 					} else {
-						//TODO Calculate Hash
-						f.State = EQUALS
+						// Calculate hash in next phase
+						f.State = NOT_CHECKED_YET
 					}
 				case SYMLINK:
 					if f.Left.Hash != f.Right.Hash {
